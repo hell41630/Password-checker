@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Strength Checker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Password Strength Checker</h1>
+        <label for="passwordInput">Enter Password:</label>
+        <input type="password" id="passwordInput" placeholder="Type your password">
+        <span id="visibilityToggle" onclick="toggleVisibility()">👁️</span>
+        <button id="checkButton" onclick="checkPassword()">Check Password</button>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+
+            fetch('/check-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultElement = document.getElementById('result');
+                resultElement.innerHTML = data.is_strong
+                    ? `<span class="success">${data.feedback}</span>`
+                    : `<span class="error">${data.feedback}</span>`;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function toggleVisibility() {
+            const passwordInput = document.getElementById('passwordInput');
+            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+        }
+    </script>
+</body>
+</html>
